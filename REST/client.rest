@@ -1,15 +1,21 @@
-### Test Conexão 
+### Buscar todo os ID
+GET http://localhost:3333/user
 
-GET http://localhost:3333
+### Buscar ID especifico
+GET http://localhost:3333/user
 
-### Test Post
+### Buscar ID especifico
+GET http://localhost:3333/user
 
-POST http://localhost:3333
+### Inserir Informação no banco
+POST http://localhost:3333/user
 content-type: application/json
 
 {
-    "name" : "FEMA",
-    "curso" : "Tecnico em Informatica",
-    "email" : "fema@fema.com",
-    "uc" : "Programação WEB 3"
+    "id": "24251627202",
+    "name": "Rafael",
+    "email":"fema@fema.com",
 }
+
+### Deletar um usuario do banco
+DELETE  http://localhost:3333/user

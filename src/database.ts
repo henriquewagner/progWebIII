@@ -1,53 +1,71 @@
-import  fs from "node:fs/promises"
+import fs from "node:fs/promises";
 
-const databasepath = new URL("../db.json", import.meta.url)
-export class Database {
-    #database:any = {}
+const databasePath = new URL("../db.json", import.meta.url);
 
-    constructor(){
-        fs.readFile(databasepath, 'utf8')
-            .then(data  => {
-                this.#database = JSON.parse(data)
-            }).catch(() => {
-                this.#persist();
-            });
-    }
-
-
-    #persist() {
-        fs.writeFile(databasepath, JSON.stringify(this.#database))
-    }
-
-    select(table:string):object {
-                                //verifica se existe é nulo
-        const data = this.#database[table] ?? []
-
-        return data
-    }
-
-    insert(table:string, data:object):object {
-        if (Array.isArray(this.#database[table])){
-           //Se sim entra aqui
-            this.#database[table].push(data);
-            this.#persist();
-        } else {
-            //Se não entra aqui
-            this.#database[table] = [data]
-            
-        }
-
-        return data
-       } 
-       
-       
-    delete(table:string, id:string){
-        const rowIndex = this.#database[table].findIndex(row =>  row.id === id)
-        
-        if(rowIndex > -1){
-            this.#database[table].splice(rowIndex, 1);
-            this.#persist();
-        }
-    }  
-
-
+interface IDatabase {
+  id: string
+  name: string
+  email: string
 }
+
+export class Database {
+  #database: IDatabase[][] = [];
+
+  constructor() {
+    fs.readFile(databasePath, "utf8")
+      .then((data) => {
+        this.#database = JSON.parse(data);
+      })
+      .catch(() => {
+        this.#persist();
+      });
+  }
+
+  #persist() {
+    fs.writeFile(databasePath, JSON.stringify(this.#database, null, 2));
+  }
+
+  select(table:number, id?: string): IDatabase[] {
+    let data = this.#database[table] ?? [];
+
+    if (id) {
+      data = data.find((row: any) => {
+        return row.id === id;
+      });
+    }
+
+    return data;
+  }
+
+  insert(table:any, data:IDatabase): IDatabase {
+    if (Array.isArray(this.#database[table])) {
+      // Se sim entra aqui
+      this.#database[table].push(data);
+      this.#persist();
+    } else {
+      // Se não entra aqui
+      this.#database[table] = [data];
+    }
+
+    return data;
+  }
+
+  delete(table:any, id: string) {
+    const rowIndex = this.#database[table].findIndex(
+      (row: any) => row.id === id
+    );
+
+    if (rowIndex > -1) {
+      this.#database[table].splice(rowIndex, 1);
+      this.#persist();
+    }}
+    update(table:any, id: string, data: IDatabase) {
+      const rowIndex = this.#database[table].findIndex((row:any) => row.id === id);
+      if (rowIndex > -1) {
+        this.#database[table][rowIndex] = { data }
+        this.#persist()
+      }
+    }
+
+  }
+
